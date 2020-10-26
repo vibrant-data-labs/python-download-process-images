@@ -6,6 +6,7 @@ downloaded_images_greyscale/
 downloaded_images.bak/
 
 # Files
+.DS_Store
 sample_data_processed.csv
 image-table.html
 cache.sqlite
