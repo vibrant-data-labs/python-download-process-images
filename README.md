@@ -1,14 +1,14 @@
 # Python Download and Processing Image Scripts
-1. Download or clone this repository: `git clone https://github.com/ericberlow/python-download-process-images.git`
-2. Change to this project's directory in your terminal: `cd python-download-process-images`
+1. Download or clone this repository: ```git clone https://github.com/ericberlow/python-download-process-images.git```
+2. Change to this project's directory in your terminal: ```cd python-download-process-images```
 
 ## Install dependencies
 > macOS
-1. Run `brew install python imagemagick inkscape webp`
-3. Run `python3 -m pip install -r requirements.txt`
+1. Run ```brew install python imagemagick inkscape webp```
+3. Run ```python3 -m pip install -r requirements.txt```
 > Ubuntu
-2. Run `sudo apt-get install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y`
-3. Run `python3 -m pip install -r requirements.txt`
+2. Run ```sudo apt-get install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y```
+3. Run ```python3 -m pip install -r requirements.txt```
 
 ## Dependencies
 
