@@ -1,0 +1,12 @@
+# Directories
+__pycache__
+.vscode
+downloaded_images/
+downloaded_images_greyscale/
+downloaded_images.bak/
+
+# Files
+sample_data_processed.csv
+image-table.html
+cache.sqlite
+log
