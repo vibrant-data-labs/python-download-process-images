@@ -16,7 +16,7 @@ python3 -m pip install -r requirements.txt
 ```
 > Ubuntu
 ```
-sudo apt-get install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y
+sudo apt install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y
 python3 -m pip install -r requirements.txt
 ```
 
