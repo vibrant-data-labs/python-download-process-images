@@ -19,53 +19,27 @@ DEFAULT_WIDTH = config['general']['default_width']
 DEFAULT_HEIGHT = config['general']['default_height']
 
 ### S3 Functions ###
-# initializes s3 by retrieving credentials and returns s3 api object
-def init_s3():
+# uploads a directory of images to s3
+def upload_dir(image_dir=IMAGE_DIR):
     sts = boto3.client('sts')
     ACCESS_KEY = config['s3']['aws_access_key_id']
     SECRET_KEY = config['s3']['aws_secret_access_key']
+    BUCKET = config['s3']['bucket']
     SESSION_TOKEN = sts.get_session_token()
-    s3 = boto3.client(
+    s3_client = boto3.client(
         's3',
         aws_access_key_id=ACCESS_KEY,
         aws_secret_access_key=SECRET_KEY,
         aws_session_token=SESSION_TOKEN
     )
-    return s3
-# uploads an image to the specified s3 bucket
-def upload_file(s3_client, file_name, bucket, object_name=None):
-    ### Upload a file to an S3 bucket
-    #
-    # :param file_name: File to upload
-    # :param bucket: Bucket to upload to
-    # :param object_name: S3 object name. If not specified then file_name is used
-    # :return: True if file was uploaded, else False
-    # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = file_name
-    # Upload the file
-    try:
-        response = s3_client.upload_file(file_name, bucket, object_name)
-    except ClientError as e:
-        print(e)
-        return False
-    return True
-
-### Setup Functions ###
-# install local image tool dependencies
-def install_tools():
-    if platform.system() == "Linux": linux()
-    if platform.system() == "Darwin": darwin()
-    if platform.system() == "Windows": print(">> Windows is not supported.")
-    if platform.system() == "": print(">> Not recognized.")
-def linux():
-    # install dependencies via apt (will only work for ubuntu)
-    os.system('sudo apt install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y')
-    os.system('python3 -m pip install -r requirements.txt')
-def darwin():
-    # install dependencies via brew (homebrew must be installed)
-    os.system('brew install python imagemagick inkscape webp')
-    os.system('python3 -m pip install -r requirements.txt')
+    image_files = os.listdir(image_dir)
+    for image in image_files:
+        filename = image_dir+"/"+image
+        print(filename)
+        try:
+            s3_client.upload_file(filename, BUCKET, image)
+        except ClientError as e:
+            print(e)
 
 ### Download Functions ###
 def get_image_name(name, sub='-', ext=''):
@@ -88,7 +62,7 @@ def image_ext_or_none(r):
     return None
 
 # download images from a csv
-def download_images(csv_file="sample_image_list.csv",uploadToS3=no_header=False):
+def download_images(csv_file="sample_image_list.csv",no_header=False):
     requests_cache.install_cache()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/540.0 (KHTML,like Gecko) Chrome/9.1.0.0 Safari/540.0"
