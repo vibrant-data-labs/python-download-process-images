@@ -7,7 +7,7 @@ downloaded_images.bak/
 
 # Files
 .DS_Store
-sample_data_processed.csv
+config.ini
+sample_image_list_processed.csv
 image-table.html
 cache.sqlite
-log

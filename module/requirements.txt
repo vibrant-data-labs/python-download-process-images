@@ -1,2 +1,0 @@
-requests==2.18.4
-requests_cache==0.5.2
