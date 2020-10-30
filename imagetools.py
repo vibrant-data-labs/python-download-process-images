@@ -92,7 +92,7 @@ def upload_dir_to_s3(image_dir=IMAGE_DIR):
     # load AWS settings from config file
     ACCESS_KEY = config['s3']['aws_access_key_id']
     SECRET_KEY = config['s3']['aws_secret_access_key']
-    BUCKET = config['s3']['bucket']
+    BUCKET = config['s3']['aws_s3_bucket']
     # retrieve session token from STS
     SESSION_TOKEN = sts.get_session_token()
     # start boto3 client

@@ -20,6 +20,13 @@ sudo apt install libcanberra-gtk-module python3-pip python3 imagemagick inkscape
 python3 -m pip install -r requirements.txt
 ```
 
+## Setup
+Copy the sample config to your own. This file will not be committed.
+```
+cp config.sample.ini config.ini
+```
+Then edit the config, filling in your own values.
+
 ## Usage as a module
 ```
 import imagetools
