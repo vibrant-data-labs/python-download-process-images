@@ -1,7 +1,7 @@
 # Directories
 __pycache__
 .vscode
-#.spyproject
+.spyproject
 downloaded_images/
 downloaded_images_greyscale/
 downloaded_images.bak/
