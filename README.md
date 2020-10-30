@@ -1,4 +1,4 @@
-# Python Download and Processing Image Scripts
+# Python Download and Processing Image Module
 1. Download or clone this repository: 
 ```
 git clone https://github.com/ericberlow/python-download-process-images.git
@@ -20,22 +20,20 @@ sudo apt install libcanberra-gtk-module python3-pip python3 imagemagick inkscape
 python3 -m pip install -r requirements.txt
 ```
 
-## Usage
+## Usage as a module
 ```
-python3 image_downloader.py sample_image_list.csv
-python3 image_processor.py downloaded_images --greyscale --resize --width 200 --height 200
-python3 html_from_csv.py
+import imagetools
+
+imagetools.download_images("sample_image_list.csv")
+imagetools.upload_dir_to_s3("downloaded_images")
 ```
 ### CSV format
 The `.csv` file must have the following positional column values for the python scripts to work  (the header names do not matter):
 
-| Organization | Logo URL | Filename |
-|--------------|----------|----------|
-|              |          |          |
+| name | image_url | filename |
+|------|-----------|----------|
+|      |           |          |
 
 ### Notes
-- It will automatically make a backup of the image, or image directory first.
-- log file contains data about the run
 - Cache is there to avoid unnecessary downloading
-- Use `--help` for command line arguments.
 

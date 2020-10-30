@@ -18,29 +18,6 @@ IMAGE_DIR = config['general']['image_dir']
 DEFAULT_WIDTH = config['general']['default_width']
 DEFAULT_HEIGHT = config['general']['default_height']
 
-### S3 Functions ###
-# uploads a directory of images to s3
-def upload_dir(image_dir=IMAGE_DIR):
-    sts = boto3.client('sts')
-    ACCESS_KEY = config['s3']['aws_access_key_id']
-    SECRET_KEY = config['s3']['aws_secret_access_key']
-    BUCKET = config['s3']['bucket']
-    SESSION_TOKEN = sts.get_session_token()
-    s3_client = boto3.client(
-        's3',
-        aws_access_key_id=ACCESS_KEY,
-        aws_secret_access_key=SECRET_KEY,
-        aws_session_token=SESSION_TOKEN
-    )
-    image_files = os.listdir(image_dir)
-    for image in image_files:
-        filename = image_dir+"/"+image
-        print(filename)
-        try:
-            s3_client.upload_file(filename, BUCKET, image)
-        except ClientError as e:
-            print(e)
-
 ### Download Functions ###
 def get_image_name(name, sub='-', ext=''):
     # Return a clean image name from an input name
@@ -106,6 +83,36 @@ def download_images(csv_file="sample_image_list.csv",no_header=False):
         mywriter = writer(f)
         for line in output_data:
             mywriter.writerow(line)
+
+### S3 Functions ###
+# uploads a directory of images to s3
+def upload_dir_to_s3(image_dir=IMAGE_DIR):
+    # launch sts from boto3
+    sts = boto3.client('sts')
+    # load AWS settings from config file
+    ACCESS_KEY = config['s3']['aws_access_key_id']
+    SECRET_KEY = config['s3']['aws_secret_access_key']
+    BUCKET = config['s3']['bucket']
+    # retrieve session token from STS
+    SESSION_TOKEN = sts.get_session_token()
+    # start boto3 client
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        aws_session_token=SESSION_TOKEN
+    )
+    # list image directory
+    image_files = os.listdir(image_dir)
+    # loop through images
+    for image in image_files:
+        # create filename
+        filename = image_dir+"/"+image
+        # try to upload the file to s3
+        try:
+            s3_client.upload_file(filename, BUCKET, image)
+        except ClientError as e:
+            print(e)
 
 ### Processing Functions ###
 def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
