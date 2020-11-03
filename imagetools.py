@@ -39,7 +39,7 @@ def image_ext_or_none(r):
     return None
 
 # download images from a csv
-def download_images(csv_file="sample_image_list.csv",no_header=False):
+def download_images(csv_file="sample_image_list.csv",as_png=True,no_header=False):
     requests_cache.install_cache()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/540.0 (KHTML,like Gecko) Chrome/9.1.0.0 Safari/540.0"
@@ -70,6 +70,11 @@ def download_images(csv_file="sample_image_list.csv",no_header=False):
                     
                     with open(file_path, 'wb') as f:
                         f.write(r.content)
+                    
+                    if as_png:
+                        if ext != '.png':
+                            file_path = change_image_type(file_path, '.png')
+                    
                     line.append(file_path)
                 else:
                     line.append(f'{r.status_code} - Image not available')
@@ -86,7 +91,7 @@ def download_images(csv_file="sample_image_list.csv",no_header=False):
 
 ### S3 Functions ###
 # uploads a directory of images to s3
-def upload_dir_to_s3(image_dir=IMAGE_DIR):
+def upload_images(image_dir=IMAGE_DIR):
     # launch sts from boto3
     sts = boto3.client('sts')
     # load AWS settings from config file
@@ -115,6 +120,31 @@ def upload_dir_to_s3(image_dir=IMAGE_DIR):
             print(e)
 
 ### Processing Functions ###
+def process_images(image_dir=IMAGE_DIR,change_type=None,resize=False,width=200,height=200,grayscale=False,padding=False,padding_width=0,padding_height=0,background_color=None):
+    # list image directory
+    image_files = os.listdir(image_dir)
+    # loop through images
+    for image in image_files:
+        # create filename
+        filename = image_dir+"/"+image
+        
+        if change_type is not None:
+            change_image_type(filename, change_type)
+
+        if resize:
+            resize_image(filename, width=width, height=height)
+
+        if padding:
+            add_padding(filename, width=padding_width,height=padding_height)
+
+        if grayscale:
+            convert_to_grayscale(filename)
+
+        if background_color is not None:
+            add_background_color(filename, background_color)
+
+        
+
 def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
     # Change image type of <name> to ext
     old_name = '.'.join(name.split('.')[:-1])
@@ -135,8 +165,6 @@ def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DE
         os.system(cmd)
         # remove previous image
         if remove_old:
-            # input('Enter..')
-            time.sleep(5)
             if os.path.exists(new_name):
                 os.system(f'rm {name}')
             else:
