@@ -210,6 +210,7 @@ def add_padding(name, width, height, color=""):
 ### S3 Functions ###
 # uploads a directory of images to s3
 def upload_images(image_dir=IMAGE_DIR,s3_bucket=BUCKET):
+    # upload images to s3 bucket and add image enpoint url to file
     # start boto3 client
     s3_client = boto3.client(
         's3',
@@ -228,3 +229,6 @@ def upload_images(image_dir=IMAGE_DIR,s3_bucket=BUCKET):
             s3_client.upload_file(filename, s3_bucket, image)
         except ClientError as e:
             print(e)
+    # make bucket if it does not exist
+    # make endpoints public        
+    # add image enpoint url to csv
