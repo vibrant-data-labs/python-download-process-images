@@ -28,11 +28,14 @@ cp config.sample.ini config.ini
 Then edit the config, filling in your own values.
 
 ## Usage as a module
-```
+```python
 import imagetools
 
-imagetools.download_images("sample_image_list.csv")
-imagetools.upload_dir_to_s3("downloaded_images")
+imagetools.download_images(csv_file="sample_image_list_noextention.csv")
+imagetools.process_images(resize=True,width=200,height=200,
+                          grayscale=True,padding=False,
+                          padding_width=100,padding_height=100)
+imagetools.upload_images(s3_bucket="this-bucket")
 ```
 ### CSV format
 The `.csv` file must have the following positional column values for the python scripts to work  (the header names do not matter):
