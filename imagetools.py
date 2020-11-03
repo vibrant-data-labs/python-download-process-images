@@ -120,7 +120,10 @@ def upload_images(image_dir=IMAGE_DIR):
             print(e)
 
 ### Processing Functions ###
-def process_images(image_dir=IMAGE_DIR,change_type=None,resize=False,width=200,height=200,grayscale=False,padding=False,padding_width=0,padding_height=0,background_color=None):
+def process_images(image_dir=IMAGE_DIR,change_type=None,
+                   resize=False,width=200,height=200,
+                   grayscale=False,padding=False,
+                   padding_width=0,padding_height=0,background_color=None):
     # list image directory
     image_files = os.listdir(image_dir)
     # loop through images
