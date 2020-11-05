@@ -52,18 +52,22 @@ def image_ext_or_none(r):
     return None
 
 # download images from a csv
-def download_images(csv_file="sample_image_list.csv",as_png=True,no_header=False):
+def download_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,as_png=True):
     requests_cache.install_cache()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/540.0 (KHTML,like Gecko) Chrome/9.1.0.0 Safari/540.0"
     }
     
     # make output directory if it doesn't exist
-    os.makedirs(IMAGE_DIR, exist_ok=True)
+    os.makedirs(image_dir, exist_ok=True)
 
     # read the input file
     data = pd.read_csv(csv_file)
 
+    # create local column
+    local = []
+
+    # loop through csv
     for row in data.itertuples():
         try:       
             image_url = row.image_url
@@ -73,7 +77,7 @@ def download_images(csv_file="sample_image_list.csv",as_png=True,no_header=False
                 ext = image_ext_or_none(r)
                 
                 if ext:                                          
-                    file_path = os.path.join(IMAGE_DIR, filename + ext)
+                    file_path = os.path.join(image_dir, filename + ext)
                     
                     with open(file_path, 'wb') as f:
                         f.write(r.content)
@@ -81,9 +85,12 @@ def download_images(csv_file="sample_image_list.csv",as_png=True,no_header=False
                     if as_png:
                         if ext != '.png':
                             file_path = change_image_type(file_path, '.png')
+                            
+                    local.append(file_path)
         except Exception as e:
-            print(f'{e} - Image not available')
-    return data
+            local.append(f'ERROR - {e}')
+    data["local"] = local
+    data.to_csv(csv_file,index=False)
 
 ### Processing Functions ###
 def process_images(image_dir=IMAGE_DIR,change_type=None,
@@ -120,11 +127,11 @@ def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DE
     new_name = f'{old_name}.{ext}'.replace('..', '.')
     if old_ext != ext.strip('.'):
         cmd = f'convert {name} {new_name}'
-
+        # TODO: fix the convert code to work with SVGs 
         # svg files need inkscape
         if old_ext == 'svg':
+            # TODO: inkscape doesn't convert SVGs
             cmd = f"inkscape -z -w {width} -h {height} {name} -e {new_name}"
-
         # webp needs webp
         if old_ext == 'webp':
             cmd = f"dwebp {name} -o {new_name}"
@@ -201,33 +208,34 @@ def add_padding(name, width, height, color=""):
 
 ### S3 Functions ###
 # uploads a directory of images to s3
-def upload_images(image_dir=IMAGE_DIR,s3_bucket=BUCKET,pd_data=None):
-    if pd_data is not None:
-        # upload images to s3 bucket and add image enpoint url to file
-        S3_CLIENT.create_bucket(Bucket=s3_bucket, ACL='public-read')
-        # list image directory
-        image_files = os.listdir(image_dir)
-        s3_urls = []
-        # loop through images
-        for image in image_files:
-            # create filename
-            filename = image_dir+"/"+image
+def upload_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,s3_bucket=BUCKET):    
+    # upload images to s3 bucket and add image enpoint url to file
+    # create bucket if it doesn't exist
+    S3_CLIENT.create_bucket(Bucket=s3_bucket, ACL='public-read')
+
+    # read the input file
+    data = pd.read_csv(csv_file)
+
+    # create s3 endpoint column
+    s3_urls = []
+
+    # loop through csv
+    for row in data.itertuples():
+        # create filename
+        filename = row.local
+        if "ERROR" not in filename:
+            image = filename.split('/')[1]
             # try to upload the file to s3
             try:
                 S3_CLIENT.upload_file(
                     filename, s3_bucket, image,
                     ExtraArgs={'ACL': 'public-read'})
+                s3_urls.append(f'https://{s3_bucket}.s3.amazonaws.com/{image}')
             except ClientError as e:
-                print(e)
-            s3_urls.append(f'https://{s3_bucket}.s3.amazonaws.com/{image}')
-        # resave .csv file with our additional column
-        # TODO: fix image count mismatch
-        # ValueError: Length of values (180) does not match length of index (186)
-        outfile = 's3_endoints.csv'
-        pd_data["s3_url"] = s3_urls
-        pd_data.to_csv(outfile,index=False)
-    else:
-        print("No pandas dataframe passed")
-
-
-    # add image enpoint url to csv
+                s3_urls.append(f'ERROR - {e}')
+            except FileNotFoundError as e:
+                s3_urls.append(f'ERROR - {e}')
+        else:
+            s3_urls.append('ERROR - not uploaded')
+    data["s3_url"] = s3_urls
+    data.to_csv(csv_file,index=False)
