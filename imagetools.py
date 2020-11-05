@@ -96,7 +96,8 @@ def download_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,as_png=
 def process_images(image_dir=IMAGE_DIR,change_type=None,
                    resize=False,width=200,height=200,
                    grayscale=False,padding=False,
-                   padding_width=0,padding_height=0,background_color=None):    # list image directory
+                   padding_width=0,padding_height=0,background_color=None):
+    # list image directory
     image_files = os.listdir(image_dir)
     # loop through images
     for image in image_files:
@@ -116,9 +117,7 @@ def process_images(image_dir=IMAGE_DIR,change_type=None,
             convert_to_grayscale(filename)
 
         if background_color is not None:
-            add_background_color(filename, background_color)
-
-        
+            add_background_color(filename, background_color)        
 
 def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
     # Change image type of <name> to ext
@@ -154,7 +153,6 @@ def get_dominant_color(name):
             cut -d")" -f 2 | cut -d" " -f 2 > {filename}'
     os.system(cmd)
 
-
     with open(f'{filename}') as file:
         hex = file.read()
 
@@ -162,48 +160,28 @@ def get_dominant_color(name):
 
     return hex.strip()
 
-
 def resize_image(name, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
     """Resize image to width x height with imagemagick"""
     size = f"{width}x{height}"
     cmd = f'convert {name} -resize {size} {name}'
-    # print(cmd)
     os.system(cmd)
-
 
 def convert_to_grayscale(name):
     """convert image to grayscale with imagemagick"""
-    base, f_name = os.path.split(name)
-
-    #create new folder for grayscale
-    new_folder = f'{base}_grayscale'
-
-    if not os.path.isdir(new_folder):
-        os.system(f'mkdir {new_folder}')
-
-    filename = os.path.join(new_folder, f_name)
-
-    #copy the image first before grayscale
-    #shutil.copyfile(name, filename)
-
-    cmd = f'convert {name} -colorspace Gray {filename}'
+    cmd = f'convert {name} -colorspace Gray {name}'
     os.system(cmd)
 
 def add_background_color(name, color):
     """Add background color to image with imagemagick"""
     cmd = f'convert {name} -background {color} -alpha remove -alpha off {name}'
-    # print(cmd)
     os.system(cmd)
 
 def add_padding(name, width, height, color=""):
     """Add white padding to the image to the desired --width and --height"""
-
-    if not color:
+    if color == "":
         color = get_dominant_color(name)
-
     size = f"{width}x{height}"
     cmd = f'convert -size {size} xc:{color} {name} -gravity center -composite {name}'
-    # print(cmd)
     os.system(cmd)
 
 ### S3 Functions ###
@@ -221,7 +199,6 @@ def upload_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,s3_bucket
 
     # loop through csv
     for row in data.itertuples():
-        # create filename
         filename = row.local
         if "ERROR" not in filename:
             image = filename.split('/')[1]
