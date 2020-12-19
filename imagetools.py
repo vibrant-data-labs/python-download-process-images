@@ -369,6 +369,7 @@ if __name__ == '__main__':
    # add original column names and s3 url cleaned of errors
    df['Recipient'] = df['name']
    df['Logo_URL'] = df['s3_url'].apply(lambda x: "" if "ERROR" in x else x) # replace error messages with empty string
+   df = df[['Recipient', 'Logo_URL']] # cleaned dataset final columns to keep
    
    # write processed file with added columns
    df.to_excel('data/test_processed.xlsx', index=False, encoding = 'utf-8-sig')
