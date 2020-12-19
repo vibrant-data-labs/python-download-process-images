@@ -5,6 +5,9 @@ __pycache__
 downloaded_images/
 downloaded_images_grayscale/
 downloaded_images.bak/
+data
+images
+
 
 # Files
 .DS_Store
