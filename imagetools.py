@@ -12,10 +12,13 @@ import pandas as pd
 from botocore.exceptions import ClientError
 import mimetypes
 from csv import reader, writer
+import pathlib as pl
 
 ### Config Setup ###
 config = configparser.ConfigParser()
-config.read('config.ini')
+wd = pl.Path.cwd() 
+configpath = wd/'config.ini'
+config.read(configpath)
 IMAGE_DIR = config['general']['image_dir']
 DEFAULT_WIDTH = config['general']['default_width']
 DEFAULT_HEIGHT = config['general']['default_height']
