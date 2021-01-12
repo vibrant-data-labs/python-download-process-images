@@ -1,5 +1,5 @@
 ### Central collection of functions for image downloading and processing ###
-### Refactored by Jesse Russell
+### Refactored by Jesse Russell and Eric Berlow
 import platform
 import os
 import time
@@ -113,7 +113,7 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     image_dir : local directory where to download images
     as_png : if true will convert all images to png
     ----------
-    Returns: datframe with new column of local image filename
+    Returns: dataframe with new column of local image filename
 
     '''
     
