@@ -3,3 +3,4 @@ requests_cache
 awscli
 boto3
 pandas
+cairosvg

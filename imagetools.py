@@ -9,6 +9,7 @@ import requests_cache
 import configparser
 import boto3
 import pandas as pd
+from cairosvg import svg2png
 from botocore.exceptions import ClientError
 import mimetypes
 from csv import reader, writer
@@ -36,7 +37,7 @@ S3_CLIENT = boto3.client(
 )
 
 ##############################
-### Download Functions ###
+###   Download Functions   ###
 ##############################
 
 def get_image_name(name, sub='-', ext=''):
@@ -146,7 +147,11 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
                     
                     if as_png:
                         if ext != '.png':
-                            file_path = change_image_type(file_path, '.png')
+                            if ext == '.svg':
+                                file_path = change_image_type(file_path, '.png')
+                                cairosvg.svg2png(url=image_url, write_to=file_path)
+                            else:
+                                file_path = change_image_type(file_path, '.png')
                             
                     d[row.name]=file_path
             else:
@@ -198,9 +203,9 @@ def change_image_type(name, ext, remove_old=True, width=DEFAULT_WIDTH, height=DE
         cmd = f'convert {name} {new_name}'
         # TODO: fix the convert code to work with SVGs 
         # svg files need inkscape
-        if old_ext == 'svg':
+        # if old_ext == 'svg':
             # TODO: inkscape doesn't convert SVGs
-            cmd = f"inkscape -z -w {width} -h {height} {name} -e {new_name}"
+            # cmd = f"inkscape -z -w {width} -h {height} {name} -e {new_name}"
         # webp needs webp
         if old_ext == 'webp':
             cmd = f"dwebp {name} -o {new_name}"

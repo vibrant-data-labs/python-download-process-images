@@ -2,10 +2,12 @@
 __pycache__
 .vscode
 .spyproject
+.history
 downloaded_images/
 downloaded_images_grayscale/
 downloaded_images.bak/
 data
+results
 images
 
 

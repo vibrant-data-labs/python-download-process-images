@@ -11,7 +11,7 @@ cd python-download-process-images
 ## Dependencies
 > macOS
 ```
-brew install python imagemagick inkscape webp
+brew install python3 cairo imagemagick webp
 python3 -m pip install -r requirements.txt
 ```
 > Ubuntu
