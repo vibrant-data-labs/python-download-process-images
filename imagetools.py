@@ -360,7 +360,7 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
 if __name__ == '__main__':
    image_directory = "data/images"
    # read file  - doesn't matter if it's csv or excel.
-   df = pd.read_excel('data/test.xlsx')[['Recipient', 'Logo_URL']] # subset columns with image name and url
+   df = pd.read_excel('data/LinkedIn_Test.xlsx', engine='openpyxl')[['id', 'image_url']] # subset columns with image name and url
    df.columns = ['name', 'image_url'] # rename columns for processing - must have these names 
 
    # download images to local directory and update dataframe with filename column
@@ -368,16 +368,16 @@ if __name__ == '__main__':
 
    # process all images in the local directory (e.g. resize, convert to grey)
    process_images(image_dir=image_directory, resize=True,width=200,height=200,
-                          grayscale=False,padding=False,
+                          grayscale=True,padding=False,
                           padding_width=100,padding_height=100)
    
    # upload images in the local directory to s3 and update dataframe with s3 endpoint
    df = upload_images_df(df, image_dir=image_directory)
    
    # add original column names and s3 url cleaned of errors
-   df['Recipient'] = df['name']
+   df['id'] = df['name']
    df['Logo_URL'] = df['s3_url'].apply(lambda x: "" if "ERROR" in x else x) # replace error messages with empty string
-   df = df[['Recipient', 'Logo_URL']] # cleaned dataset final columns to keep
+   df = df[['id', 'Logo_URL']] # cleaned dataset final columns to keep
    
    # write processed file with added columns
-   df.to_excel('data/test_processed.xlsx', index=False, encoding = 'utf-8-sig')
+   df.to_excel('data/LinkedIn_Test_Processed.xlsx', index=False, encoding = 'utf-8-sig')
