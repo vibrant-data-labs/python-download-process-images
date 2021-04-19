@@ -149,7 +149,7 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
                         if ext != '.png':
                             if ext == '.svg':
                                 file_path = change_image_type(file_path, '.png')
-                                cairosvg.svg2png(url=image_url, write_to=file_path)
+                                svg2png(url=image_url, write_to=file_path)
                             else:
                                 file_path = change_image_type(file_path, '.png')
                             
@@ -360,9 +360,26 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
 if __name__ == '__main__':
    image_directory = "data/images"
    # read file  - doesn't matter if it's csv or excel.
-   df = pd.read_excel('data/LinkedIn_Test.xlsx', engine='openpyxl')[['id', 'image_url']] # subset columns with image name and url
-   df.columns = ['name', 'image_url'] # rename columns for processing - must have these names 
+   df = pd.read_excel('data/LinkedIn_Test.xlsx', engine='openpyxl')[['name', 'image_url']] # subset columns with image name and url
+   # note - data must have must have these column names 'name' and 'image_url'
+   
+   image_url_file = 'data/LinkedIn_test.csv'
+   df.to_csv(image_url_file, index=False)
 
+   # download images to local directory and update dataframe with filename column
+   download_images(csv_file=image_url_file, image_dir=image_directory, as_png=True) # convert all to png if possible
+
+   # process all images in the local directory (e.g. resize, convert to grey)
+   process_images(image_dir=image_directory, resize=True,width=200,height=200,
+                          grayscale=True,padding=False,
+                          padding_width=100,padding_height=100)
+   
+   # upload images in the local directory to s3 and update dataframe with s3 endpoint
+   upload_images(csv_file=image_url_file, image_dir=image_directory)
+
+   #############################################################
+   ### below is to process from pandas dataframe, not csv ###
+   '''   
    # download images to local directory and update dataframe with filename column
    df = download_images_df(df, image_dir=image_directory, as_png=True) # convert all to png if possible
 
@@ -373,7 +390,8 @@ if __name__ == '__main__':
    
    # upload images in the local directory to s3 and update dataframe with s3 endpoint
    df = upload_images_df(df, image_dir=image_directory)
-   
+   '''
+
    # add original column names and s3 url cleaned of errors
    df['id'] = df['name']
    df['Logo_URL'] = df['s3_url'].apply(lambda x: "" if "ERROR" in x else x) # replace error messages with empty string
