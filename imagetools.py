@@ -360,8 +360,10 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
 if __name__ == '__main__':
    image_directory = "data/images"
    # read file  - doesn't matter if it's csv or excel.
-   df = pd.read_excel('data/LinkedIn_Test.xlsx', engine='openpyxl')[['name', 'image_url']] # subset columns with image name and url
-   # note - data must have must have these column names 'name' and 'image_url'
+   # note - data must have must have these column names 'name', 'image_url', 'filename'
+   df = pd.read_excel('data/LinkedIn_Test.xlsx', engine='openpyxl') # subset columns with image name and url
+   df['filename'] = ''
+
    
    image_url_file = 'data/LinkedIn_test.csv'
    df.to_csv(image_url_file, index=False)
