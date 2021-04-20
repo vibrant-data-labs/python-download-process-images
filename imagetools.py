@@ -334,7 +334,7 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
         filename = row.filename
         mime_type = mimetypes.guess_type(filename)[0] # detect image type (png, jpg, svg, etc)
         if "ERROR" not in filename: # double check no other errors to skip
-            image = filename.split('/')[1]
+            image = filename.split('/')[-1]
             # try to upload the file to s3
             try:
                 S3_CLIENT.upload_file(
