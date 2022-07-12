@@ -19,22 +19,29 @@ import pathlib as pl
 config = configparser.ConfigParser()
 wd = pl.Path.cwd() 
 configpath = wd/'config.ini'
-config.read(configpath)
-IMAGE_DIR = config['general']['image_dir']
-DEFAULT_WIDTH = config['general']['default_width']
-DEFAULT_HEIGHT = config['general']['default_height']
-# load AWS settings from config file
-REGION = config['aws']['region']
-ACCESS_KEY = config['aws']['access_key_id']
-SECRET_KEY = config['aws']['secret_access_key']
-BUCKET = config['aws']['s3_bucket']
-# start global boto3 s3 client
-S3_CLIENT = boto3.client(
-    's3',
-    aws_access_key_id=ACCESS_KEY,
-    aws_secret_access_key=SECRET_KEY,
-    region_name=REGION
-)
+if configpath.exists():
+    config.read(configpath)
+
+    IMAGE_DIR = config['general']['image_dir']
+    DEFAULT_WIDTH = config['general']['default_width']
+    DEFAULT_HEIGHT = config['general']['default_height']
+    # load AWS settings from config file
+    REGION = config['aws']['region']
+    ACCESS_KEY = config['aws']['access_key_id']
+    SECRET_KEY = config['aws']['secret_access_key']
+    BUCKET = config['aws']['s3_bucket']
+    # start global boto3 s3 client
+    S3_CLIENT = boto3.client(
+        's3',
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        region_name=REGION
+    )
+else:
+    IMAGE_DIR = None
+    DEFAULT_WIDTH = 0
+    DEFAULT_HEIGHT = 0
+    BUCKET = None
 
 ##############################
 ###   Download Functions   ###
