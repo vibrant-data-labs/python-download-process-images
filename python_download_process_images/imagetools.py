@@ -5,7 +5,7 @@ import os
 import time
 import shutil
 import requests
-import requests_cache
+#import requests_cache
 import configparser
 import boto3
 import pandas as pd
@@ -68,7 +68,7 @@ def image_ext_or_none(r):
 
 # download images from a csv
 def download_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,as_png=True):
-    requests_cache.install_cache()
+    #requests_cache.install_cache()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/540.0 (KHTML,like Gecko) Chrome/9.1.0.0 Safari/540.0"
     }
@@ -125,7 +125,7 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
 
     '''
     
-    requests_cache.install_cache()
+    #requests_cache.install_cache()
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/540.0 (KHTML,like Gecko) Chrome/9.1.0.0 Safari/540.0"
     }

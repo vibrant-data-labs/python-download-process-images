@@ -1,5 +1,5 @@
 import pandas as pd
-import imagetools
+import python_download_process_images.imagetools as imagetools
 
 df = pd.read_csv('data/test_df.csv')
 image_directory = "data/images"
