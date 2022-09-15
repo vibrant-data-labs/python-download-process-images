@@ -4,7 +4,7 @@ import imagetools
 
 # def download_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,as_png=True)
 
-imagetools.download_images(csv_file="sample_image_list_noextention.csv")
+imagetools.download_images(csv_file="./sample_image_list.csv")
 
 # def process_images(image_dir=IMAGE_DIR,change_type=None,
 # resize=False,width=200,height=200,grayscale=False,
@@ -15,5 +15,5 @@ imagetools.download_images(csv_file="sample_image_list_noextention.csv")
 # def upload_images(csv_file="sample_image_list_local.csv",image_dir=IMAGE_DIR,
 # s3_bucket=BUCKET)
 
-imagetools.upload_images(csv_file="sample_image_list_noextention.csv",
-                            s3_bucket="openmappr-imgs")
+# imagetools.upload_images(csv_file="sample_image_list_noextention.csv",
+                            # s3_bucket="openmappr-imgs")
