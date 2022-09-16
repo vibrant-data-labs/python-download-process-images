@@ -31,6 +31,10 @@ brew postinstall python3
 brew install python3 cairo imagemagick webp
 python3 -m pip install -r requirements.txt
 ```
+> Please note that if you are using Anaconda for development, you must also install the cairo package via conda:
+```bash
+conda install cairo
+```
 ### Ubuntu
 ```
 sudo apt install libcanberra-gtk-module python3-pip python3 imagemagick inkscape webp -y
