@@ -58,13 +58,16 @@ def get_image_name(name, sub='-', ext=''):
 
 def image_ext_or_none(r):
     # verify that the response we've got is actually an image
-    content = r.headers['Content-Type'].lower()
-    if 'image' in content:
-        if 'svg' in content:
-            return '.svg'
-        else:
-            return '.' + content.split('/')[1]  
-    return None
+    try:
+        content = r.headers['Content-Type'].lower()
+        if 'image' in content:
+            if 'svg' in content:
+                return '.svg'
+            else:
+                return '.' + content.split('/')[1]  
+        return None
+    except:
+        return None
 
 # download images from a csv
 def download_images(csv_file="sample_image_list.csv",image_dir=IMAGE_DIR,as_png=True):
@@ -139,32 +142,33 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     # loop through dataframe
     for row in df.itertuples():
         print("downloading image for %s" %row.name)
-        try:       
-            image_url = row.image_url
-            if image_url:
-                filename = get_image_name(row.name)
+        #try:       
+        image_url = row.image_url
+        if image_url:
+            filename = get_image_name(row.name)
+            if image_url.startswith('http'):
                 r = requests.get(image_url, timeout=10, headers=headers)               
                 ext = image_ext_or_none(r)
+            
+            if ext:                                          
+                file_path = os.path.join(image_dir, filename + ext)
                 
-                if ext:                                          
-                    file_path = os.path.join(image_dir, filename + ext)
-                    
-                    with open(file_path, 'wb') as f:
-                        f.write(r.content)
-                    
-                    if as_png:
-                        if ext != '.png':
-                            if ext == '.svg':
-                                file_path = change_image_type(file_path, '.png')
-                                svg2png(url=image_url, write_to=file_path)
-                            else:
-                                file_path = change_image_type(file_path, '.png')
-                            
-                    d[row.name]=file_path
-            else:
-                d[row.name] = "no url"
+                with open(file_path, 'wb') as f:
+                    f.write(r.content)
                 
-        except:
+                if as_png:
+                    if ext != '.png':
+                        if ext == '.svg':
+                            file_path = change_image_type(file_path, '.png')
+                            svg2png(url=image_url, write_to=file_path)
+                        else:
+                            file_path = change_image_type(file_path, '.png')
+                        
+                d[row.name]=file_path
+        else:
+            d[row.name] = "no url"
+            
+        #except:
             d[row.name]="url broken" # no results found
     df['filename'] = df['name'].map(d) # map filename value to name as new column in dataframe
     df['filename'].fillna("other url error", inplace=True)
