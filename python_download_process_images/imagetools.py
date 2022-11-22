@@ -142,37 +142,44 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     # loop through dataframe
     for row in df.itertuples():
         print("downloading image for %s" %row.name)
-        #try:       
-        image_url = row.image_url
-        if image_url:
-            filename = get_image_name(row.name)
-            if image_url.startswith('http'):
+        try:       
+            image_url = row.image_url
+            if image_url and image_url.startswith('http'):
+                filename = get_image_name(row.name)
                 r = requests.get(image_url, timeout=10, headers=headers)               
                 ext = image_ext_or_none(r)
-            
-            if ext:                                          
-                file_path = os.path.join(image_dir, filename + ext)
-                
-                with open(file_path, 'wb') as f:
-                    f.write(r.content)
-                
-                if as_png:
-                    if ext != '.png':
-                        if ext == '.svg':
-                            file_path = change_image_type(file_path, '.png')
-                            svg2png(url=image_url, write_to=file_path)
-                        else:
-                            file_path = change_image_type(file_path, '.png')
-                        
-                d[row.name]=file_path
-        else:
-            d[row.name] = "no url"
-            
-        #except:
+
+                if ext:                                          
+                    file_path = os.path.join(image_dir, filename + ext)
+                    
+                    with open(file_path, 'wb') as f:
+                        f.write(r.content)
+                    
+                    if as_png:
+                        if ext != '.png':
+                            if ext == '.svg':
+                                file_path = change_image_type(file_path, '.png')
+                                svg2png(url=image_url, write_to=file_path)
+                            else:
+                                file_path = change_image_type(file_path, '.png')
+                            
+                    d[row.name] = file_path
+                else:
+                    d[row.name] = "other url error"
+            else:
+                d[row.name] = "other url error"            
+        except:
             d[row.name]="url broken" # no results found
     df['filename'] = df['name'].map(d) # map filename value to name as new column in dataframe
     df['filename'].fillna("other url error", inplace=True)
-    return df
+    
+    # remove rows that have no filepath or error name
+    error_rows = df['filename'].isin(["", "no url", "url broken", "other url error"])
+    df_trimmed = df[~error_rows].reset_index(drop=True)
+
+    df.to_csv("testing.csv", index=False)
+    df_trimmed.to_csv("testing2.csv", index=False)
+    return df_trimmed
       
 
 ##############################
@@ -334,13 +341,9 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
 
     # create s3 endpoint column
     s3_urls_dict = {} # dictionary to hold results {name: s3_url}
-    
-    # remove rows that have no filepath or error name
-    error_rows = df['filename'].isin(["", "no url", "url broken", "other url error"])
-    df_trimmed = df[~error_rows].reset_index(drop=True)
 
     # loop through dataframe
-    for row in df_trimmed.itertuples():
+    for row in df.itertuples():
         print("uploading image for %s to s3 bucket: %s " %(row.name, s3_bucket))
         filename = row.filename
         mime_type = mimetypes.guess_type(filename)[0] # detect image type (png, jpg, svg, etc)
@@ -351,7 +354,7 @@ def upload_images_df(df,image_dir=IMAGE_DIR,s3_bucket=BUCKET):
                 S3_CLIENT.upload_file(
                     filename, s3_bucket, image,
                     ExtraArgs={'ACL': 'public-read', # make the endpoint public
-                               'ContentType': mime_type}) #  image type necessary for display instead of download 
+                                'ContentType': mime_type}) #  image type necessary for display instead of download 
                 s3_urls_dict[row.name]= (f'https://{s3_bucket}.s3.amazonaws.com/{image}')
             except ClientError as e:
                 s3_urls_dict[row.name]=(f'ERROR - {e}')
