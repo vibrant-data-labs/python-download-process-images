@@ -177,8 +177,9 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     error_rows = df['filename'].isin(["", "no url", "url broken", "other url error"])
     df_trimmed = df[~error_rows].reset_index(drop=True)
 
-    df.to_csv("testing.csv", index=False)
-    df_trimmed.to_csv("testing2.csv", index=False)
+    # output results to CSV before and after trimming for testing purposes
+    # df.to_csv("testing.csv", index=False)
+    # df_trimmed.to_csv("testing2.csv", index=False)
     return df_trimmed
       
 
