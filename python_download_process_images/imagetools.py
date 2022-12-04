@@ -180,8 +180,7 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     # output results to CSV before and after trimming for testing purposes
     # df.to_csv("testing.csv", index=False)
     # df_trimmed.to_csv("testing2.csv", index=False)
-    return df_trimmed
-      
+    return df_trimmed, error_rows
 
 ##############################
 ### Processing Functions ###
@@ -399,8 +398,8 @@ if __name__ == '__main__':
    #############################################################
    ### below is to process from pandas dataframe, not csv ###
  
-   # download images to local directory and update dataframe with filename column
-   df = download_images_df(df, image_dir=image_directory, as_png=True) # convert all to png if possible
+   # download images to local directory and update dataframe with filename column, plus return separate errors dataframe
+   df, error_rows = download_images_df(df, image_dir=image_directory, as_png=True) # convert all to png if possible
 
    # process all images in the local directory (e.g. resize, convert to grey)
    process_images(image_dir=image_directory, resize=True,width=200,height=200,
