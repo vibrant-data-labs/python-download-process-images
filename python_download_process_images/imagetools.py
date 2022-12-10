@@ -138,6 +138,7 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     os.makedirs(image_dir, exist_ok=True)
 
     d = {} # dictionary to hold results {name:filename} pairs
+    e = {} # dictonary to hold errors {name:error} pairs
 
     # loop through dataframe
     for row in df.itertuples():
@@ -164,20 +165,26 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
                                 file_path = change_image_type(file_path, '.png')
                             
                     d[row.name] = file_path
+                    e[row.name] = ""
                 else:
-                    d[row.name] = "other url error"
+                    d[row.name] = ""
+                    e[row.name] = "FileExtensionError"
             else:
-                d[row.name] = "other url error"            
+                d[row.name] = ""
+                e[row.name] = "ImageUrlError"            
         except:
-            d[row.name]="url broken" # no results found
+            d[row.name]=""
+            e[row.name] = "ImageDownloadError"      
     df['filename'] = df['name'].map(d) # map filename value to name as new column in dataframe
-    df['filename'].fillna("other url error", inplace=True)
+    df['filename'].fillna("", inplace=True)
+    df['error'] = df['name'].map(e) # map error value to name as new column in dataframe
+    df['error'].fillna("", inplace=True)
     
     # remove rows that have no filepath or error name
-    error_rows = df['filename'].isin(["", "no url", "url broken", "other url error"])
-    df_trimmed = df[~error_rows].reset_index(drop=True)
-
-    return df_trimmed, error_rows
+    error_rows = df.apply(lambda x: (x['filename'] == "") or (x['error'] in ["FileExtensionError", "ImageUrlError", "ImageDownloadError"]), axis=1)
+    df_success = df[~error_rows].reset_index(drop=True)
+    df_failures = df[error_rows].reset_index(drop=True)
+    return df_success, df_failures
 
 ##############################
 ### Processing Functions ###
