@@ -183,7 +183,9 @@ def download_images_df(df, image_dir=IMAGE_DIR,as_png=True):
     # remove rows that have no filepath or error name
     error_rows = df.apply(lambda x: (x['filename'] == "") or (x['error'] in ["FileExtensionError", "ImageUrlError", "ImageDownloadError"]), axis=1)
     df_success = df[~error_rows].reset_index(drop=True)
+    # create a dataframe of the error
     df_failures = df[error_rows].reset_index(drop=True)
+    
     return df_success, df_failures
 
 ##############################
