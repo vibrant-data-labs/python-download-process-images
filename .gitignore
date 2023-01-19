@@ -9,7 +9,7 @@ downloaded_images.bak/
 data
 results
 images
-
+*.egg-info/
 
 # Files
 .DS_Store
@@ -17,3 +17,7 @@ config.ini
 sample_image_list_processed.csv
 image-table.html
 cache.sqlite
+
+
+dist
+env

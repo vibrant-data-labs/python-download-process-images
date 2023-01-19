@@ -1,8 +1,0 @@
-README.md
-setup.py
-python_download_process_images.egg-info/PKG-INFO
-python_download_process_images.egg-info/SOURCES.txt
-python_download_process_images.egg-info/dependency_links.txt
-python_download_process_images.egg-info/not-zip-safe
-python_download_process_images.egg-info/requires.txt
-python_download_process_images.egg-info/top_level.txt
